@@ -1,0 +1,112 @@
+﻿@page "/"
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+<head>
+<title></title>
+<script src="bootstrap-4.3.1-dist/js/jquery.min.js"></script>
+<script src="bootstrap-4.3.1-dist/js/popper.min.js"></script>
+<script type="text/javascript" src="bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="bootstrap-4.3.1-dist/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="Poppins-font/stylesheet.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css">
+<link rel="stylesheet" href="fontawesome-free-5.7.0/css/fontawesome.min.css">
+</head>
+
+ <body>
+<div class="container-fluid">
+    <div class="row no-gutter">
+        <div class="col-md-8 d-none d-flex bg-image">
+            <div style="color: #fff;padding:0px 90px;width: 650px;">
+                <span style="font-size:20px;">Welcome</span><br />
+                <h2>Employee Training Portal</h2>
+                <div style="font-family: 'poppinsregular';font-size: 12px">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,</div>
+            </div>
+        </div>
+
+        <div class="col-md-4" style="background-color: #fbfdff">
+            <div class="login py-3">
+                <div class="container-fluid">
+                    <div class="row">
+
+                        <div class="col-lg-12 mx-auto">
+                            <img src="img/KanTime_logo.png" style="width:150px;float: right;">
+                            <div class="LoginBody" style="">
+                                <div class="loginbox">
+                                    <div class="wrap-login">
+                                        <input @bind="loginId" class="Login-input" type="text" name="email" placeholder="Username">
+                                        <span class="focus-input"></span>
+                                        <span class="symbol-input">
+                                            <img src="img/User_icon.svg" style="width:16px;">
+                                        </span>
+                                    </div>
+
+                                    <div class="wrap-login">
+                                        <input @bind="password" class="Login-input" type="password" name="pass" placeholder="Password">
+                                        <span class="focus-input"></span>
+                                        <span class="symbol-input">
+                                            <img src="img/Password_icon.svg" style="width:16px;">
+                                        </span>
+                                    </div>
+
+                                    <div class="container-form-btn text-right mt-3">
+                                        <button type="button" class="btn login-form-btn" @onclick="Login">
+                                            Login
+                                        </button>
+                                        @if (!string.IsNullOrEmpty(errorMessage))
+                                        {
+                                            <div class="alert alert-danger mt-2">@errorMessage</div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+@code {
+    private string loginId = "";
+    private string password = "";
+    private string errorMessage = "";
+
+    private async Task Login()
+    {
+        errorMessage = "";
+        if (string.IsNullOrEmpty(loginId) || string.IsNullOrEmpty(password))
+        {
+            errorMessage = "Username and password cannot be empty.";
+            return;
+        }
+
+        try
+        {
+            var response = await Http.GetFromJsonAsync<UserResponse>($"http://localhost:5274/api/v1/users/login?login_id={loginId}&password={password}");
+
+            if (response != null)
+            {
+                // Navigate to the next page
+                NavigationManager.NavigateTo("/EmployeePortal");
+            }
+            else
+            {
+                // Show error message
+                errorMessage = "Invalid login ID or password.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+    }
+
+    public class UserResponse
+    {
+        public int userId { get; set; }
+        public string loginId { get; set; }
+    }
+}

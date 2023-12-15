@@ -1,0 +1,1550 @@
+﻿@page "/EmployeePortal"
+
+@using PilotProject.Models
+@using System.Text.Json
+@using Microsoft.JSInterop
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Calendars
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMPLOYEE PORTAL</title>
+
+
+    <link rel="stylesheet" type="text/css" href="bootstrap-4.3.1-dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap-select.min.css">
+    <link rel="stylesheet" type="text/css" href="Poppins-font/stylesheet.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" href="fontawesome-free-5.7.0/css/all.css">
+    <link rel="stylesheet" type="text/css" href="css/alert.css">
+    <script src="bootstrap-4.3.1-dist/js/jquery.min.js"></script>
+    <script src="bootstrap-4.3.1-dist/js/popper.min.js"></script>
+    <script type="text/javascript" src="bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-select.min.js"></script>
+    <!-- Moment.js -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+    <!-- Date Range Picker -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <!-- SweetAlert -->
+    <script type="text/javascript" src="https://cdn.rawgit.com/t4t5/sweetalert/v0.2.0/lib/sweet-alert.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/t4t5/sweetalert/v0.2.0/lib/sweet-alert.css">
+
+</head>
+
+
+   <body>
+      <div class="sticky-header header-section ">
+         <table class="HeaderTable" width="100%">
+            <tbody>
+               <tr>
+                  <td class="percentage25 pl-2">
+                     <table>
+                        <tbody>
+                           <tr>
+                              <td>
+                                 <div class="logo">
+                                    <a href="Login.html">
+                                    <img src="img/KanTimeLogo.png" width="85">
+                                    </a>
+                                 </div>
+                              </td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </td>
+                  <td class="">
+                     <div class="header-center">
+                        Employee Portal
+                     </div>
+                  </td>
+                  <td class="percentage25 pr-2" align="right" >
+                        <table>
+                        <tr>
+                           <td class="pr-2"> 
+                              <button class="btn btn-sm btn-light btn_sec mb-0" data-toggle="collapse" data-target="#FilterSection" style="font-size: 0.8rem;"> <img src="img/Filter_icon.svg"> &nbsp; Filters <img src="img/dropdown.svg"></button>
+                          </td>
+                           <td>
+                              <div class="dropdown_block" style="cursor:pointer;">
+                                 <div class="dropdown dropleft">
+                                    <span class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <img src="img/Profile_icon.svg" class="image_cursor" style="width:26px;">
+                                    <span class="caret"></span>
+                                    </span>
+                                    <div class="dropdown-menu login-dropdown-menu" x-placement="left-start" style="position: absolute; transform: translate3d(-171px, 1px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                       <a class="dropdown-item semibold" style="color:#184978;font-size:0.9rem"> John, Doe </a>
+                                       <a class="dropdown-item" style="color:#184978">Johndoe@gmail.com </a>
+                                       <a class="dropdown-item"> <span class="bold">Last Login:</span> 04/27/2022 10:19:18 AM</a>
+                                       <div class="Logout_div" onclick="location.href='Login.html'">
+                                          <button class="btn btn-sm Logout_button"><i class="fa fa-power-off" style="font-size:15px;"></i> &nbsp;LOGOUT</button>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </td>
+                        </tr>
+                     </table>
+                  </td>
+               </tr>
+            </tbody>
+         </table>
+      </div>
+
+    <!--  FILTER EMPLOYEE-->
+    
+   
+    <div class="container-fluid filter_container">
+        <div class="collapse" id="FilterSection">
+            <section>
+                <div class="row">
+                    <div class="col-lg-9 col-md-12 cl-sm-12 col-12 py-1 px-0  sub_row">
+                        <div class="d-flex flex-wrap">
+                              <div class="py-1 px-3 ">
+                              <span class="semibold">Employee Name</span> <br/>
+
+                                @if (employees1 != null)
+                                {
+                                    <SfMultiSelect TValue="string[]" TItem="EmployeeViewModel" Placeholder="Search Name" DataSource="@employees1" AllowFiltering="true">
+                                        <MultiSelectEvents TItem="EmployeeViewModel" TValue="string[]" OnValueSelect="@SelectionName" OnValueRemove="@ValueRemoved" Cleared="@(()=>selectedEmployeeId.Clear())"></MultiSelectEvents>
+                                                <MultiSelectFieldSettings Text="Name" Value="EmployeeUniqueId"></MultiSelectFieldSettings>
+                                        </SfMultiSelect>
+                                     }
+                                  
+                              <i class="fa fa-search" aria-hidden="true"></i>
+                           </div>
+                            <div class="py-1 px-3">
+                                <span class="semibold">Department</span> <br />
+                                @if (departments != null)
+                                {
+                                    <SfMultiSelect TValue="string[]" TItem="Department" Placeholder="Search Name" DataSource="@departments" AllowFiltering="true">
+                                        <MultiSelectEvents TItem="Department" TValue="string[]" OnValueSelect="@SelectionDepartment" OnValueRemove="@ValueRemovedhandler" Cleared="@(()=>selectedDepartment.Clear())"></MultiSelectEvents>
+                                        <MultiSelectFieldSettings Text="DepartmentName" Value="DepartmentId"></MultiSelectFieldSettings>
+                                    </SfMultiSelect>
+                                }
+                            </div>                   
+                            
+  
+                            <div class="py-1 px-3">
+                                <span class="semibold">Age Between</span> <br />
+                                <input type="text" class="input_ctrl" @bind="ageFrom" style="width: 60px;"> -  <input type="text" @bind="ageTo" class="input_ctrl" style="width: 60px;">
+                            </div>
+                            <div class="py-1 px-3">
+                                <span class="semibold">Hire Date</span> <br />
+                                <SfDateRangePicker TValue="DateTime?" Placeholder="Choose a range" FullScreen="true" ShowClearButton="true">
+                                    <DateRangePickerEvents TValue="DateTime?" RangeSelected="RangeSelectHandler"></DateRangePickerEvents>
+                                </SfDateRangePicker><img src="img/calendar.svg" class="calenderImage" style="z-index:-10;" width="18">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-12 cl-sm-12 col-12 py-1 px-2  sub_row text-right">
+                        <button class="btn btn-sm btn-normal btn_sec mb-0" @onclick="DisplayEmployees" ><i class="fa fa-eye" aria-hidden="true"></i> Display</button>
+                        <button class="btn btn-sm btn-normal  btn_sec mb-0" data-toggle="modal" data-target="#AddRecord"><i class="fa fa-plus" aria-hidden="true"></i> Add Employee</button>
+                        <img src="img/ExporttoExcel.svg" data-toggle="tooltip" title="Export to Excel" width="25">
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div> 
+
+  
+
+    <!--EMPLOYEE LIST-->
+      <div class="container-fluid mt-2">
+         <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-12">
+
+                @if (employees != null)
+                {
+                    <table class="table ParentTable Parent_table_res">
+                        <thead>
+                            <tr>
+                                <th style="width:60px">
+                                    <label class="check_label pl-3">
+                                        <input type="checkbox" class="SelectAll" @bind="selectAllChecked" @onclick="HandleSelectAll">
+                                        <span class="checkmark"></span> &nbsp;
+                                    </label>
+
+                                    <img src="img/@(selectAllChecked ? "Minus" : "Plus").svg" style="border:1px solid #eee;" class="parentAllshow" @onclick="ToggleAllDetails">
+                                    <img src="img/Minus.svg" style="border:1px solid #eee;" class="parentAllshowhide d-none"> 
+                                </th>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Hired Date</th>
+                                <th>DOB</th>
+                                <th>Age</th>
+                                <th>Department</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var employee in employees)
+                            {
+                                <tr >
+                                     <td>
+                                        <label class="check_label pl-3">
+                                            <input type="checkbox" class="column_check" @bind="employee.IsChecked" @onclick="() => HandleCheckbox(employee)">
+                                            <span class="checkmark"></span> &nbsp;
+                                        </label>
+                                        <img src="img/@(employee.ShowDetails ? "Minus" : "Plus").svg" style="border:1px solid #eee;" class="parentshow" @onclick:preventDefault @onclick="(() => ToggleDetails(employee))">
+                                        
+                                    </td> 
+                                    <td>@employee.EmployeeId</td>
+                                    <td>@employee.Name</td>
+                                    <td>@employee.HiredDate.ToString("MM/dd/yyyy")</td>
+                                    <td>@employee.Dob.ToString("MM/dd/yyyy")</td>
+                                    <td>@calculateAge(employee.Dob)</td>
+                                    <td>@employee.DepartmentName</td>
+
+                                    <td>
+                                        <span data-toggle="tooltip" title="Add Emergency Contact">
+                                            <img src="img/Add.svg" data-toggle="modal" data-target="#AddContact" @onclick="@(() => AddContactId = employee.EmployeeUniqueId)">
+                                        </span>
+                                        <span data-toggle="tooltip" title="Edit">
+                                            <img src="img/Edit.svg" data-toggle="modal" data-target="#EditRecord" @onclick="@(() => SetEditEmployee(employee))">
+                                        </span>
+                                        <img src="img/Delete.svg" id="b4" data-toggle="tooltip" title="Delete" @onclick="@(() => DeleteEmployee(employee.EmployeeUniqueId))">
+                                    </td>
+                                </tr>
+
+                                @foreach (var contact in employee.Contacts)
+                                {
+                                    <tr class="hidetblparent @(employee.ShowDetails ? "" : "d-none")">
+                                        <td></td>
+                                        <td colspan="7" class="ChildTable_Parent">
+                                            <div class="pt-2">
+                                                <table class="w-100 Child_Table" style="table-layout: fixed;">
+                                                    <tr>
+                                                        <td><span class="Grey_Label">Name</span><br />@contact.Name</td>
+                                                        <td><span class="Grey_Label">Relation</span><br />@contact.Relation</td>
+                                                        <td style="width: 300px;"><span class="Grey_Label">Address</span><br />@contact.Address</td>
+                                                        <td><span class="Grey_Label">Phone</span><br />@contact.Phone</td>
+                                                        <td><span class="Grey_Label">Email</span><br />@contact.Email</td>
+                                                        <td>
+                                                            <span data-toggle="tooltip" title="Edit">
+                                                                <img src="img/Edit.svg" class="mt-2" data-toggle="modal" data-target="#EditEmergency" @onclick="@(()=>SetEditContact(contact))">
+                                                            </span>
+                                                            <img src="img/Delete.svg" class="mt-2" data-toggle="tooltip" title="Delete" @onclick="@(() => DeleteEmployeeContact(employee.EmployeeUniqueId, contact.EmployeeContactId))">
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+
+                   
+                }
+                else
+                {
+                    <p>Error loading data</p>
+                }
+                
+            </div>
+         </div>
+      </div>
+
+
+    <!--  EDIT EMPLOYEE-->
+ <div class="modal" id="EditRecord">
+   <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+         <div class="modal-header custom-modal-header">
+               <span class="modal-title semibold">Edit Employee Details</span>
+               <button type="button" class="close" data-dismiss="modal">&times;</button>
+         </div>
+
+                <form class="container px-0 needs-validation" id="needs-validation" @onsubmit="@(() =>UpdateEmployee())"  >
+            <div class="modal-body custom-modal-body">     	
+                <div class="row">
+                  <div class="col-lg-4 col-lg-4 col-sm-6 col-12">
+                     <div class="form-group">
+                      <label class="text-inverse" for="">Employee ID</label>
+                      <input type="text" class="form-control" id="" @bind="@editEmployeeId"  required>
+                      <div class="invalid-feedback">
+                        Please provide a valid Employee ID.
+                       </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 col-lg-4 col-sm-6 col-12">
+                    <div class="form-group">
+                      <label class="text-inverse" for="validationCustom02">Name</label>
+                      <input type="text" class="form-control" id="validationCustom02" @bind="@editEmployeeName"  required>
+                      <div class="invalid-feedback">
+                        Please provide a valid Name.
+                       </div>
+                    </div>  
+                  </div>
+                	<div class="col-lg-4 col-lg-4 col-sm-6 col-12">
+                     <div class="form-group">
+                        <label for="optionA">Gender</label><br/>
+                        <div class="form-check d-inline">
+                                        <input class="form-check-input" type="radio" checked name="choice" id="emailConsentRadio" @bind="@editEmployeeName" required>
+                          <label class="form-check-label" for="optionA">
+                                                Male
+                                            </label>
+                        </div> &emsp;
+                        <div class="form-check d-inline">
+                                        <input class="form-check-input" type="radio" name="choice" id="emailConsentRadio" @bind="@editEmployeeName" required>
+                          <label class="form-check-label" for="optionB">
+                                                female
+                                            </label>
+                          <div class="invalid-feedback">
+                           Please provide a valid Gender.
+                          </div>
+                        </div>
+                    
+                      </div> 
+                 </div>
+                  <div class="col-lg-4 col-lg-4 col-sm-6 col-12">
+                    <div class="form-group">
+                      <label class="text-inverse" for="">Date of Birth</label><br/>
+                                    <SfDatePicker TValue="DateTime?" @bind-Value="@editEmployeeDob">
+                                        <DatePickerEvents TValue="DateTime?" ValueChange="@ChangeDOB"></DatePickerEvents>
+                                    </SfDatePicker>
+                                    @* <input type="datetime" class="input_ctrl form-control date_txt" name="DOB" @bind="@editEmployeeDob" style="display:inline-block;" required> 
+                       <img src="img/Calendar.svg" class="calenderImage" width="18">*@
+                  
+                      <div class="invalid-feedback">
+                        Please provide a valid DOB.
+                      </div>
+                    </div>  
+                  </div>
+                  <div class="col-lg-4 col-lg-4 col-sm-6 col-12">
+                    <div class="form-group">
+                      <label class="text-inverse" for="select-menu">Department</label>
+
+                            <select class="input_selectdrp form-control mt-0" @bind="@editEmployeeDepartmentId" required>
+                                <option></option>
+                                @if (departments != null)
+                                {
+                                    @foreach (var department in departments)
+                                    {
+                                        <option value="@department.DepartmentId">@department.DepartmentName</option>
+                                    }
+                                }
+                            </select>
+                      <div class="invalid-feedback">
+                        Please selected any option.
+                      </div>
+                    </div>  
+                  </div>
+
+                            <div class="col-lg-4 col-lg-4 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label class="text-inverse" for="">Hired Date</label><br />
+                                    <SfDatePicker TValue="DateTime?" @bind-Value="@editEmployeeHiredDate">
+                                        <DatePickerEvents TValue="DateTime?" ValueChange="@ChangeHireDate"></DatePickerEvents>
+                                    </SfDatePicker>
+                                    @* <input type="datetime" class="input_ctrl form-control date_txt" name="HiredDate" @bind="@editEmployeeHiredDate" style="display:inline-block;" required> 
+                                    <img src="img/Calendar.svg" class="calenderImage" width="18">*@
+
+                                    <div class="invalid-feedback">
+                                        Please provide a valid HIRED DATE.
+                                    </div>
+                                </div>
+                            </div>
+               </div>
+                        
+         
+
+           </div>
+           <div class="modal-footer custom-modal-footer">
+               <button class="btn btn-sm close_button btn_sec " data-dismiss="modal"> Cancel</button>
+               <button class="btn btn-sm btn-normal btn_sec " id="Savebutton" type="submit"> Save Details</button>
+            </div>
+        </form>
+         
+     
+   </div>
+   </div>
+</div>
+
+    <!--  ADD EMPLOYEE -->
+   <div class="modal" id="AddRecord">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header custom-modal-header">
+                    <span class="modal-title semibold">Add Employee Details</span>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <form class="container px-0 needs-validation" id="needs-validation2" @onsubmit="async (e) => {  await SubmitForm(); }" >
+                    <div class="modal-body custom-modal-body">
+                        <div class="row">
+                            <div class="col-lg-4 col-lg-4 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label class="text-inverse" for="">Employee ID</label>
+                                    <input type="text" class="form-control" name="employeeId" @bind="formData.employeeId"  required>
+                                    <div class="invalid-feedback">
+                                        Please provide a valid Employee ID.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-lg-4 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label class="text-inverse" for="validationCustom02">Name</label>
+                                    <input type="text" class="form-control" name="name" @bind="formData.name" required>
+                                    <div class="invalid-feedback">
+                                        Please provide a valid Name.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-lg-4 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <input type="hidden" name="gender" @bind="formData.gender" />
+                                    <label for="optionA">Gender</label><br />
+                                    <div class="form-check d-inline">
+                                        <input class="form-check-input" type="radio" name="gender"  id="M" required @onchange="@(() => OnGenderChange("M"))">
+                                        <label class="form-check-label" for="M"> Male </label>
+                                    </div> &emsp;
+                                    <div class="form-check d-inline">
+                                        <input class="form-check-input" type="radio" name="gender" id="F" required @onchange="@(() => OnGenderChange("F"))">
+                                        <label class="form-check-label" for="F"> female </label>
+                                        <div class="invalid-feedback" @if(string.IsNullOrEmpty(formData.gender))>
+                                            Please provide a valid Gender.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-lg-4 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label class="text-inverse" for="">Date of Birth</label><br />
+                                    <SfDatePicker TValue="DateTime?" >
+                                        <DatePickerEvents TValue="DateTime?" ValueChange="@SetDOB"></DatePickerEvents>
+                                    </SfDatePicker>
+                                   @*  <input type="datetime-local" class="input_ctrl form-control date_txt"  name="dob" @bind="formData.dob" style="display:inline-block;" required> 
+                                    <img src="img/Calendar.svg" class="calenderImage" width="18">*@
+                                    <div class="invalid-feedback">
+                                        Please provide a valid DOB.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-lg-4 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label class="text-inverse" for="select-menu">Department</label>
+                                    <select class="input_selectdrp form-control mt-0" name="departmentId" @bind="formData.departmentId" required>
+                                        <option></option>
+                                        @if (departments != null)
+                                        {
+                                            @foreach(var department in departments)
+                                            {
+                                                <option value="@department.DepartmentId">@department.DepartmentName</option>
+                                            }
+                                        }                                     
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select any option.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-lg-4 col-sm-6 col-12">
+                                <div class="form-group">
+                                    <label class="text-inverse" for="">Hire Date</label><br />
+                                    <SfDatePicker TValue="DateTime?" >
+                                       <DatePickerEvents TValue="DateTime?" ValueChange="@setHireDate"></DatePickerEvents>
+                                    </SfDatePicker>
+                                    @* <input type="datetime-local" class="input_ctrl form-control date_txt" @bind="formData.hiredDate" name="hireDate" style="display:inline-block;" required> 
+                                    <img src="img/Calendar.svg" class="calenderImage" width="18">*@
+                                    <div class="invalid-feedback">
+                                        Please provide a valid Hire Date.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer custom-modal-footer">
+                        <button class="btn btn-sm close_button btn_sec" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-sm btn-normal btn_sec" id="Savebutton2" type="submit">Save Details</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!--  EDIT CONTACT-->
+<div class="modal" id="EditEmergency">
+
+   <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+   
+            <div class="modal-header custom-modal-header">
+               <span class="modal-title semibold">Edit Emergency Contact Details</span>
+               <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+                <form class="container px-0 needs-validation" id="needs-validation4" @onsubmit="@(()=>UpdateEmployeeContact())" >
+            <div class="modal-body custom-modal-body">
+
+            	
+          <div class="row">
+            
+            <div class="col-lg-4 col-sm-6 col-12">
+              <div class="form-group">
+                <label class="text-inverse" for="validationCustom02">Name</label>
+                                    <input type="text" class="form-control" id="validationCustom02" @bind="@editContactName" required>
+                <div class="invalid-feedback">
+                  Please provide a valid Name.
+                 </div>
+              </div>  
+            </div>
+         
+            
+            <div class="col-lg-4 col-sm-6 col-12">
+               <div class="form-group">
+                 <label class="text-inverse" for="">Relation</label>
+                                    <input type="text" class="form-control" id="" @bind="@editContactRelation" required>
+                 <div class="invalid-feedback">
+                   Please provide a valid Relation.
+                 </div>
+               </div>  
+             </div>
+      
+            
+
+            <div class="col-lg-4 col-sm-6 col-12">
+              <div class="form-group">
+                <label class="text-inverse" for="">Email</label>
+                                    <input type="email" class="form-control" @bind="@editContactEmail" id="" required>
+                <div class="invalid-feedback">
+                  Please provide a valid Email.
+                </div>
+              </div>  
+            </div>
+            <div class="col-lg-3 col-sm-6 col-12">
+              <div class="form-group">
+                <label class="text-inverse" for="">Phone</label>
+                                    <input type="text" class="form-control" id="" @bind="@editContactPhone" required>
+                <div class="invalid-feedback">
+                  Please provide a valid Phone.
+                </div>
+              </div>  
+            </div>
+         
+            <div class="col-lg-3 col-sm-6 col-12">
+              <div class="form-group">
+                <label class="text-inverse" for="validationCustom03">City</label>
+                                    <input type="text" class="form-control" id="validationCustom03" @bind="@editContactCity" required>
+                <div class="invalid-feedback">
+                  Please provide a valid city.
+                </div>
+              </div>  
+            </div>
+
+            <div class="col-lg-3 col-sm-6 col-12">
+              <div class="form-group">
+                <label class="text-inverse" >ZIP</label>
+                                    <input type="text" class="form-control" @bind="@editContactZip" required>
+                <div class="invalid-feedback">
+                  Please provide a valid ZIP.
+                </div>
+              </div>  
+            </div>
+            <div class="col-lg-6 col-sm-6 col-12">
+              <div class="form-group">
+              <span class="semibold">Address</span><br>
+                        <textarea class="input_ctrl form-control" @bind="@editContactAddress" required></textarea>
+                        <div class="invalid-feedback">
+                  Please provide a valid Address.
+                </div>
+            </div>
+          </div> 
+      </div>
+         </div>
+           <div class="modal-footer custom-modal-footer">
+               <button class="btn btn-sm close_button btn_sec " data-dismiss="modal"> Cancel</button>
+               <button class="btn btn-sm btn-normal btn_sec " id="Savebutton" type="submit"> Save Details</button>
+            </div>
+        </form>
+         
+      
+   </div>
+</div>
+</div>
+
+    <!-- ADD EMERGENCY CONTACT -->
+   
+        <div class="modal" id="AddContact">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header custom-modal-header">
+                        <span class="modal-title semibold">Add Employee Contact</span>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Add Contact Form -->
+                    <form @onsubmit="@(() => AddContact(AddContactId))">
+                        <div class="modal-body custom-modal-body">
+
+
+                            <div class="row">
+
+                                <div class="col-lg-4 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label class="text-inverse" for="validationCustom02">Name</label>
+                                        <input type="text" class="form-control" id="validationCustom02" @bind="@newContact.Name" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid Name.
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-lg-4 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label class="text-inverse" for="">Relation</label>
+                                        <input type="text" class="form-control" id="" @bind="@newContact.Relation" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid Relation.
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-lg-4 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label class="text-inverse" for="">Email</label>
+                                        <input type="email" class="form-control" id="" @bind="@newContact.Email" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid Email.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label class="text-inverse" for="">Phone</label>
+                                        <input type="text" class="form-control" id="" @bind="@newContact.Phone" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid Phone.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label class="text-inverse" for="validationCustom03">City</label>
+                                        <input type="text" class="form-control" id="validationCustom03" @bind="@newContact.City" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid city.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label class="text-inverse">ZIP</label>
+                                        <input type="text" class="form-control" @bind="@newContact.Zip" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid ZIP.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <span class="semibold">Address</span><br>
+                                        <textarea class="input_ctrl form-control" @bind="@newContact.Address" required></textarea>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid Address.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer custom-modal-footer">
+                            <button class="btn btn-sm close_button btn_sec " data-dismiss="modal"> Cancel</button>
+                            <button class="btn btn-sm btn-normal btn_sec " id="Savebutton" type="submit"> Save Details</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    
+
+    <!--existed script -->
+    <script type="text/javascript" defer>
+         $(function() {
+            $('[data-toggle="tooltip"]').tooltip();
+
+                $(function() {
+                  $('input[name="DOB"]').daterangepicker({
+                    singleDatePicker: true,
+                    showDropdowns: true,
+                    autoApply: true,
+                    minYear: 1901,
+                    maxYear: parseInt(moment().format('YYYY'),10)
+                  }, function(start, end, label) {
+                    var years = moment().diff(start, 'years');
+  
+                  });
+                });
+
+           $('input[name="datefilter"]').daterangepicker({
+               autoUpdateInput: false,
+               autoApply: true,
+               locale: {
+                   cancelLabel: 'Clear',
+                  
+               }
+           });
+         
+           $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+               $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+           });
+         
+           $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+               $(this).val('');
+           });
+         
+         
+         
+             $(document).ready(function(){
+         
+         $(".parentAllshowhide").click(function(event) {        
+
+            if($(".ParentTable").find(".parentshow").hasClass("d-none")){   
+                 $(this).parent().parent().parent().parent().find(".parentshowhide").addClass("d-none");
+                  
+                     $(this).parent().parent().parent().parent().find(".hidetblparent").addClass("d-none");
+                
+                $(this).parent().parent().parent().parent().find(".parentshow").removeClass("d-none");
+                 }
+         
+                  $(".parentAllshow").toggleClass('d-none');
+                  $(this).toggleClass('d-none');;
+                  });
+         
+         
+             $(".parentAllshow").click(function(event) { 
+
+            if($(".ParentTable").find(".parentshowhide").hasClass("d-none")){        
+            $(this).parent().parent().parent().parent().find(".parentshow").addClass("d-none");
+            if($(this).parent().parent().parent().parent().find(".hidetblparent").hasClass('d-none')){         
+              $(this).parent().parent().parent().parent().find(".hidetblparent").removeClass("d-none");
+            }
+            
+            else{
+         
+         
+            }
+                $(this).parent().parent().parent().parent().find(".parentshowhide").removeClass("d-none");
+                 }
+         
+                
+                 
+                  $(".parentAllshowhide").toggleClass('d-none');
+                  $(this).toggleClass('d-none');;
+                  });
+         
+                   $(".parentshow").click(function(event) {
+                  $(this).parent().parent().closest('tr').next('tr.hidetblparent').removeClass("d-none");
+                   $(this).parent().parent().find(".parentshowhide").toggleClass('d-none');
+                   $(this).parent().parent().find(".parentshow").toggleClass('d-none');
+                  
+                  });
+                  
+                   $(".parentshowhide").click(function(event) {
+                   $(this).parent().parent().closest('tr').next('tr.hidetblparent').addClass("d-none");
+                   $(this).parent().parent().find(".parentshowhide").toggleClass('d-none');
+                   $(this).parent().parent().find(".parentshow").toggleClass('d-none');
+                  
+                  });
+         
+                    $(".SelectAll").click(function(){
+            if($(this).is(":checked")){
+               $(".column_check").prop('checked',true);
+             
+               }
+         
+            if(!$(this).is(":checked")){
+          
+            $(".column_check").prop('checked',false);}
+          });
+         
+        
+         });
+          });
+         
+         
+      </script>
+
+
+      <script>
+
+    (function() {
+    'use strict';
+    window.addEventListener('load', function() {
+      var form = document.getElementById('needs-validation');
+      form.addEventListener('submit', function(event) {
+         
+
+        
+        if(form.checkValidity() === false ){
+
+          event.preventDefault();
+          event.stopPropagation();
+         // $("#MandatoryCheck").show();
+          
+        }
+
+        else{
+        	
+        	
+        	$("#EditRecord").modal("hide");
+        	 event.preventDefault();
+          event.stopPropagation();
+          triggerAlert('Saved successfully','success');
+          //$("#MandatoryCheck").hide();
+        	 
+        }
+        form.classList.add('was-validated');
+
+                   
+
+      }, false);
+
+
+    }, false);
+
+  })();
+
+   
+  (function() {
+    'use strict';
+    window.addEventListener('load', function() {
+      var form = document.getElementById('needs-validation2');
+      form.addEventListener('submit', function(event) {
+        if(form.checkValidity() === false ){
+
+          event.preventDefault();
+          event.stopPropagation();
+         // $("#MandatoryCheck").show();
+          
+        }
+
+        else{
+        	
+        	
+        	$("#AddRecord").modal("hide");
+        	 event.preventDefault();
+          event.stopPropagation();
+          triggerAlert('Saved successfully','success');
+          //$("#MandatoryCheck").hide();
+        	 
+        }
+        form.classList.add('was-validated');
+      }, false);
+
+
+    }, false);
+
+  })();
+
+     
+  (function() {
+    'use strict';
+    window.addEventListener('load', function() {
+      var form = document.getElementById('needs-validation3');
+      form.addEventListener('submit', function(event) {
+        if(form.checkValidity() === false ){
+
+          event.preventDefault();
+          event.stopPropagation();
+         // $("#MandatoryCheck").show();
+          
+        }
+
+        else{
+        	
+        	
+        	$("#AddEmergency").modal("hide");
+        	 event.preventDefault();
+          event.stopPropagation();
+          triggerAlert('Saved successfully','success');
+          //$("#MandatoryCheck").hide();
+        	 
+        }
+        form.classList.add('was-validated');
+
+                   
+
+      }, false);
+
+
+    }, false);
+
+  })();
+
+
+
+     
+  (function() {
+    'use strict';
+    window.addEventListener('load', function() {
+      var form = document.getElementById('needs-validation4');
+      form.addEventListener('submit', function(event) {
+        if(form.checkValidity() === false ){
+
+          event.preventDefault();
+          event.stopPropagation();
+         // $("#MandatoryCheck").show();
+          
+        }
+
+        else{
+        	
+        	
+        	$("#EditEmergency").modal("hide");
+        	 event.preventDefault();
+          event.stopPropagation();
+          triggerAlert('Saved successfully','success');
+          //$("#MandatoryCheck").hide();
+        	 
+        }
+        form.classList.add('was-validated');
+
+                   
+
+      }, false);
+
+
+    }, false);
+
+  })();
+
+  document.getElementById('b4').onclick = function(){
+
+
+	swal({
+		title: "Are you sure?",
+		text: "You will not be able to recover this details!",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: '#DD6B55',
+		confirmButtonText: 'Yes, delete it!',
+		closeOnConfirm: false,
+	
+	},
+	function(){
+		swal("Deleted!", "Your details  has been deleted!", "success");
+	});
+};
+
+</script>
+<!--close modal-->
+    <script>
+        function closeEditEmergencyModal() {
+            $('#EditEmergency').modal('hide');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+        }
+   
+        function closeEditRecordModal() {
+            $('#EditRecord').modal('hide');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+        }
+        function closeAddContactModal() {
+                $('#AddContact').modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+            }
+        function closeAddRecordModal() {
+            $('#AddRecord').modal('hide');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+        }
+
+        // Add this script in your Razor page or a shared JavaScript file
+        window.getSelectedValues = function (id) {
+            var selectElement = document.getElementById(id);
+            var selectedValues = Array.from(selectElement.selectedOptions).map(option => option.value);
+            return selectedValues;
+        };
+
+        window.getElementValue = function (id) {
+            var element = document.getElementById(id);
+            return element.value;
+        };
+
+    
+    </script>
+
+   
+
+
+    
+  
+    
+ <script src="js/alert.js"></script>
+   </body>
+
+
+@code {
+
+    private void ChangeDOB(Syncfusion.Blazor.Calendars.ChangedEventArgs<DateTime?> args)
+    {
+        editEmployeeDob = args.Value;
+
+    }
+
+    private void ChangeHireDate(Syncfusion.Blazor.Calendars.ChangedEventArgs<DateTime?> args)
+    {
+        editEmployeeHiredDate = args.Value;
+
+    }
+    private void SetDOB(Syncfusion.Blazor.Calendars.ChangedEventArgs<DateTime?> args)
+    {
+        formData.dob = args.Value;
+
+    }
+
+    private void setHireDate(Syncfusion.Blazor.Calendars.ChangedEventArgs<DateTime?> args)
+    {
+        formData.hiredDate = args.Value;
+
+    }
+
+
+    private int AddContactId { get; set; }
+    List<EmployeeViewModel> employees;
+    List<EmployeeViewModel> employees1;
+    List<Department> departments;
+    EmployeeFormData formData = new EmployeeFormData();
+    private NewContactModel newContact = new NewContactModel();
+
+    private string editEmployeeId;
+    private string editEmployeeName;
+    private string editEmployeeGender { get; set; }
+    private DateTime? editEmployeeDob { get; set; }
+    private int editEmployeeDepartmentId { get; set; }
+    private DateTime? editEmployeeHiredDate { get; set; }
+    public int employeeUniqueId { get; set; }
+
+    private int employeeContactId { get; set; }
+    private string editContactName { get; set; }
+    private string editContactRelation { get; set; }
+    private string editContactEmail { get; set; }
+    private string editContactPhone { get; set; }
+    private string editContactCity { get; set; }
+    private string editContactZip { get; set; }
+    private string editContactAddress { get; set; }
+    <!-- for filter-->
+    List<int> selectedEmployeeId = new List<int>();
+    private List<int> selectedDepartment = new List<int>();
+    private string ageFrom;
+    private string ageTo;
+    private string hiredDateFrom;
+    private string hiredDateTo;
+
+
+
+    private async Task DisplayEmployees()
+    {
+        try
+        {
+            filterButton = true;
+            await LoadEmployeeData();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception: {ex.Message}");
+        }
+    }
+  
+
+
+
+    void SelectionName(SelectEventArgs<EmployeeViewModel>  args)
+    {
+        var selectedOptions = args.ItemData;
+        if (selectedOptions!=null)
+        {
+            var selectedOption = selectedOptions.EmployeeUniqueId;
+
+            if (!selectedEmployeeId.Contains(selectedOption))
+            {
+                selectedEmployeeId.Add(selectedOption);
+            }
+
+        }
+
+    }
+    void SelectionDepartment(SelectEventArgs<Department> args)
+    {
+        var selectedOptions = args.ItemData;
+
+        if (selectedOptions != null)
+        {
+            var selectedOption = selectedOptions.DepartmentId;
+
+
+            if (!selectedDepartment.Contains(selectedOption))
+            {
+                selectedDepartment.Add(selectedOption);
+            }
+
+        }
+
+    }
+    public void RangeSelectHandler(RangePickerEventArgs<DateTime?> args)
+    {
+        hiredDateFrom = args.StartDate?.ToString("yyyy-MM-dd");
+        hiredDateTo = args.EndDate?.ToString("yyyy-MM-dd");
+
+        // Print or use the dates as needed
+        Console.WriteLine($"Selected Start Date: {hiredDateFrom}");
+        Console.WriteLine($"Selected End Date: {hiredDateTo}");
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await LoadEmployeeData();
+        await LoadDepartment();
+    }
+
+
+
+    private async Task LoadEmployeeData()
+    {
+        try
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {   
+                var employeeIds = selectedEmployeeId.Count>0 ? string.Join(",", selectedEmployeeId) : string.Empty;
+                var departmentIds = selectedDepartment.Count>0 ? string.Join(",", selectedDepartment) : string.Empty;
+                ageFrom = ageFrom != null ? ageFrom : "0";
+                ageTo = ageTo != null ? ageTo : "0";
+                hiredDateFrom = hiredDateFrom != null ? hiredDateFrom : null;
+                hiredDateTo = hiredDateFrom != null ? hiredDateTo : null;
+
+                var apiUrl = $"http://localhost:5274/api/employees?employee_unique_id={employeeIds}&department_id={departmentIds}&age_from={ageFrom}&age_to={ageTo}&hired_date_from={hiredDateFrom}&hired_date_to={hiredDateTo}";
+                var response = await httpClient.GetAsync(apiUrl);
+                Console.WriteLine("MANI EMP LIST" + (employeeIds != string.Empty ? employeeIds : "None") + departmentIds);
+
+                if (response.IsSuccessStatusCode)
+                {
+
+                    employees = await response.Content.ReadFromJsonAsync<List<EmployeeViewModel>>();
+                    if (!filterButton)
+                    {
+                        employees1 = employees;
+                    }
+                    Console.WriteLine("MANI" + employees[0].Name);
+                    hiredDateFrom = null;
+                    hiredDateTo = null; 
+
+
+                }
+                else
+                {
+
+                    Console.WriteLine($"Error: {response.StatusCode}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+
+            Console.WriteLine($"Exception: {ex.Message}");
+        }
+    }
+
+
+    private async Task LoadDepartment()
+    {
+        try
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                
+
+                var apiUrl = $"http://localhost:5274/api/Department";
+                var response = await httpClient.GetAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+
+                    departments = await response.Content.ReadFromJsonAsync<List<Department>>();
+                    Console.WriteLine("MANI" + departments[0].DepartmentName);
+
+                }
+                else
+                {
+
+                    Console.WriteLine($"Error: {response.StatusCode}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+
+            Console.WriteLine($"Exception: {ex.Message}");
+        }
+    }
+
+    async Task SubmitForm()
+    {
+        try
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+               
+
+                var apiUrl = "http://localhost:5274/api/employees";
+
+                // Convert the formData object to JSON
+                var jsonContent = JsonSerializer.Serialize(formData);
+                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+                Console.WriteLine($"MANI req: {jsonContent}");
+
+                // Send the POST request
+                var response = await httpClient.PostAsync(apiUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Read the response and obtain the new employee ID
+                    var result = await response.Content.ReadFromJsonAsync<NewEmployeeResponse>();
+                    Console.WriteLine($"New Employee ID: {result?.new_employee_unique_id}");
+
+                    // Clear the form data and reload employee data
+                    ClearFormData();
+                    await JSRuntime.InvokeVoidAsync("closeAddRecordModal");
+                    await LoadEmployeeData();
+                }
+                else
+                {
+                    Console.WriteLine($"Error: {response.StatusCode}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception: {ex.Message}");
+        }
+    }
+    async Task UpdateEmployee()
+    {
+        try
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                var apiUrl = $"http://localhost:5274/api/employees/{employeeUniqueId}";
+
+                // Create an object with the updated employee data
+                var updatedEmployee = new EmployeeFormData
+                    {
+                        employeeId = editEmployeeId,
+                        name = editEmployeeName,
+                        gender = editEmployeeGender, 
+                        dob = editEmployeeDob,      
+                        departmentId = editEmployeeDepartmentId, 
+                        hiredDate = editEmployeeHiredDate 
+                    };
+
+                // Convert the updatedEmployee object to JSON
+                var jsonContent = JsonSerializer.Serialize(updatedEmployee);
+                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+                Console.WriteLine($"Update request: {jsonContent}");
+
+                // Send the PUT request
+                var response = await httpClient.PutAsync(apiUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    await JSRuntime.InvokeVoidAsync("closeEditRecordModal");
+                    await LoadEmployeeData();
+                }
+                else
+                {
+                    Console.WriteLine($"Error: {response.StatusCode}");
+                    // Handle error appropriately (e.g., show a message to the user)
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception: {ex.Message}");
+            // Handle exception appropriately (e.g., show a message to the user)
+        }
+    }
+    async Task UpdateEmployeeContact()
+    {
+        try
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                var apiUrl = $"http://localhost:5274/api/employees/{employeeUniqueId}/contacts/{employeeContactId}";
+
+                var updatedContact = new EmployeeContactViewModel
+                    {
+                       
+                        Name = editContactName,
+                        Relation = editContactRelation,
+                        Email = editContactEmail,
+                        Phone = editContactPhone,
+                        City = editContactCity,
+                        Zip = editContactZip,
+                        Address=editContactAddress
+                    };
+
+               
+                var jsonContent = JsonSerializer.Serialize(updatedContact);
+                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+                Console.WriteLine($"Update contact request: {jsonContent}");
+
+
+                var response = await httpClient.PutAsync(apiUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Reload employee data after successful update
+                    await JSRuntime.InvokeVoidAsync("closeEditEmergencyModal");
+                    await LoadEmployeeData();
+                }
+                else
+                {
+                    Console.WriteLine($"Error: {response.StatusCode}");
+                    // Handle error appropriately (e.g., show a message to the user)
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception: {ex.Message}");
+            // Handle exception appropriately (e.g., show a message to the user)
+        }
+    }
+
+
+    private async Task AddContact(int employeeId)
+    {
+        // Make API call to add contact
+        var jsonContent = JsonSerializer.Serialize(newContact);
+        Console.WriteLine($"MANI req: {jsonContent}");
+
+        var response = await httpClient.PostAsJsonAsync($"http://localhost:5274/api/employees/{employeeId}/contacts", newContact);
+
+        // Check if the request was successful (status code 200)
+        if (response.IsSuccessStatusCode)
+        {
+            await JSRuntime.InvokeVoidAsync("closeAddContactModal");
+            await LoadEmployeeData();
+        }
+        else
+        {
+            // Handle error adding contact
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error adding contact: {errorMessage}");
+        }
+
+        // Close the modal after handling the form submission
+       // await JSRuntime.InvokeVoidAsync("$('#AddContact-{employeeId}').modal('hide');");
+    }
+
+
+    private async Task DeleteEmployee(int employeeId)
+    {
+        try
+        {
+            // Display SweetAlert confirmation dialog
+            var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this employee?");
+
+            // If the user clicks "Yes"
+            if (confirmed)
+            {
+                // Make API call to delete employee
+                var response = await httpClient.DeleteAsync($"http://localhost:5274/api/employees/{employeeId}");
+
+                // Check if the request was successful (status code 200)
+                if (response.IsSuccessStatusCode)
+                {
+                    // Employee deleted successfully, reload data
+                    await LoadEmployeeData();
+                }
+                else
+                {
+                    // Handle error deleting employee
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Error deleting employee: {errorMessage}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle other exceptions
+            Console.WriteLine($"Error deleting employee: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteEmployeeContact(int employeeUniqueId, int contactId)
+    {
+        try
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                var apiUrl = $"http://localhost:5274/api/employees/{employeeUniqueId}/contacts/{contactId}";
+                var response = await httpClient.DeleteAsync(apiUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Contact deleted successfully, reload data or perform any other necessary actions
+                    await LoadEmployeeData();
+                }
+                else
+                {
+                    // Handle error deleting contact
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Error deleting contact: {errorMessage}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle other exceptions
+            Console.WriteLine($"Error deleting contact: {ex.Message}");
+        }
+    }
+
+    void SetEditEmployee(EmployeeViewModel employee)
+    {
+        employeeUniqueId = employee.EmployeeUniqueId;
+        editEmployeeId = employee.EmployeeId;
+        editEmployeeName = employee.Name;
+        editEmployeeGender = employee.Gender;
+        editEmployeeDob = employee.Dob;
+        editEmployeeDepartmentId = employee.DepartmentId;
+        editEmployeeHiredDate = employee.HiredDate;
+    }
+
+    void SetEditContact(EmployeeContactViewModel employee)
+    {
+        employeeUniqueId = employee.EmployeeUniqueId;
+        employeeContactId = employee.EmployeeContactId;
+        editContactName = employee.Name;
+        editContactRelation = employee.Relation;
+        editContactEmail = employee.Email;
+        editContactPhone = employee.Phone;
+        editContactCity = employee.City;
+        editContactZip = employee.Zip;
+        editContactAddress = employee.Address;
+    }
+
+    private void ValueRemoved(RemoveEventArgs<EmployeeViewModel> args)
+    {
+            var selectedOptions = args.ItemData;
+            var selectedOption = selectedOptions.EmployeeUniqueId;
+            if (selectedEmployeeId.Contains(selectedOption))
+            {
+                selectedEmployeeId.Remove(selectedOption);
+            }
+           
+        
+    }
+    private void ValueRemovedhandler(RemoveEventArgs<Department> args)
+    {
+            var selectedOptions = args.ItemData;
+            var selectedOption = selectedOptions.DepartmentId;
+            
+            if (selectedDepartment.Contains(selectedOption))
+            {
+                selectedDepartment.Remove(selectedOption);
+            }
+            
+        
+    }
+
+
+
+
+    private int calculateAge(DateTime dob)
+    {
+        // Add your logic to calculate age here
+        return DateTime.Now.Year - dob.Year;
+    }
+    public void OnGenderChange(string e)
+    {
+
+        formData.gender = e;
+    }
+
+
+    private void ClearFormData()
+    {
+        formData.employeeId = "";
+        formData.name = "";
+        formData.gender = "";
+        formData.dob = DateTime.Now;
+        formData.departmentId = 1;
+        formData.hiredDate = DateTime.Now;
+    }
+
+
+
+    private bool selectAllChecked = false;
+    private bool ShowDetails = false;
+    private bool filterButton = false;
+
+
+    private void HandleSelectAll()
+    {
+        selectAllChecked = !selectAllChecked;
+
+
+        foreach (var employee in employees)
+        {
+            employee.IsChecked = selectAllChecked;
+        }
+
+
+        this.StateHasChanged();
+    }
+
+
+
+    private void HandleCheckbox(EmployeeViewModel employee)
+    {
+        employee.IsChecked = !employee.IsChecked;
+    }
+
+
+    private void ToggleDetails(EmployeeViewModel employee)
+    {
+
+
+        employee.ShowDetails = !employee.ShowDetails;
+    }
+
+    // Function to handle header icon click
+    private void ToggleAllDetails()
+    {
+        ShowDetails = !ShowDetails;
+
+        foreach (var employee in employees)
+        {
+
+            employee.ShowDetails = ShowDetails;
+        }
+
+        this.StateHasChanged();
+    }
+
+   
+
+}
+

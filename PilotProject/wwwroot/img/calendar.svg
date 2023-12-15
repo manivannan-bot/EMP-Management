@@ -1,0 +1,19 @@
+<svg id="calendar" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="17.502" height="17.428" viewBox="0 0 17.502 17.428">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectangle_22" data-name="Rectangle 22" width="17.502" height="17.428" transform="translate(0 0)" fill="none"/>
+    </clipPath>
+  </defs>
+  <rect id="Rectangle_15" data-name="Rectangle 15" width="15.879" height="12.141" transform="translate(0.812 4.428)" fill="#fff"/>
+  <rect id="Rectangle_16" data-name="Rectangle 16" width="2.152" height="2.152" transform="translate(3.711 7.569)" fill="#444"/>
+  <rect id="Rectangle_17" data-name="Rectangle 17" width="2.152" height="2.152" transform="translate(7.441 7.569)" fill="#444"/>
+  <rect id="Rectangle_18" data-name="Rectangle 18" width="2.152" height="2.152" transform="translate(3.711 11.36)" fill="#444"/>
+  <rect id="Rectangle_19" data-name="Rectangle 19" width="2.152" height="2.152" transform="translate(7.441 11.36)" fill="#444"/>
+  <rect id="Rectangle_20" data-name="Rectangle 20" width="2.152" height="2.152" transform="translate(11.331 7.569)" fill="#444"/>
+  <rect id="Rectangle_21" data-name="Rectangle 21" width="2.152" height="2.152" transform="translate(11.331 11.36)" fill="#444"/>
+  <g id="Group_8" data-name="Group 8" transform="translate(0 -0.001)">
+    <g id="Group_7" data-name="Group 7" clip-path="url(#clip-path)">
+      <path id="Path_35" data-name="Path 35" d="M17.213,4.07a.981.981,0,0,0-.694-.289H13.668V.984A.987.987,0,0,0,12.684,0c-.021,0-.039.011-.06.013S12.585,0,12.564,0a.987.987,0,0,0-.984.984v2.8H5.922V.984A.987.987,0,0,0,4.938,0c-.021,0-.039.011-.06.013S4.839,0,4.818,0a.987.987,0,0,0-.984.984v2.8H.983A.987.987,0,0,0,0,4.765v11.68a.987.987,0,0,0,.983.984H16.519a.986.986,0,0,0,.983-.984V4.765a.977.977,0,0,0-.289-.695M8.751,15.843,1.6,15.829,1.66,8.17l.028-2.816,7.063,0,7.063,0,.029,2.816.059,7.659Z" fill="#444"/>
+    </g>
+  </g>
+</svg>

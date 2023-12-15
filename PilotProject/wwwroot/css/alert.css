@@ -1,0 +1,74 @@
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.alert-container {
+    position: fixed;
+    top: 90px;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
+    right: 10px;
+    color: #000;
+
+}
+
+@media only screen and (min-width: 600px) {
+    .alert-container {
+        width: fit-content;
+    }
+}
+
+.modal-alert {
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    display: none;
+    padding: 15px;
+    border-radius: 8px;
+    position: relative;
+    border-radius: 0px;
+}
+
+
+.modal-alert .content {
+    display: flex;
+    align-items: center;
+}
+
+.modal-alert .content img {
+    opacity: 0.9;
+    margin: 0 10px;
+}
+
+.modal-alert h6 {
+    opacity: 0.9;
+    color: #000;
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 0px;
+}
+
+.modal-alert .bar {
+    height: 3px;
+    left: 8px;
+    bottom: 0px;
+    background: rgb(255, 231, 15);
+    position: absolute;
+    border-radius: 4px 4px 0 0;
+}
+
+.progress {
+    animation: alertProgress 5s ease;
+}
+
+@keyframes alertProgress {
+    from {
+        width: 90%;
+    }
+    to {
+        width: 0;
+    }
+}
